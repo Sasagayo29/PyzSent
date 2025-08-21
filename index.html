@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="Dashboard de monitoramento de instrumentos piezométricos"
+        />
+        <title>PyzSent</title>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="css/img/logo/Blue & Black Technology Logo.svg">
+
+        <!-- Estilo -->
+        <link rel="stylesheet" href="css/style.css" />
+
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <!-- XLSX.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+        <!-- Font Awesome -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+    </head>
+    <body>
+        <div id="loader" class="loader-overlay">
+            <div class="loader-content">
+                <div class="loader-spinner"></div>
+                <p>Carregando dados...</p>
+            </div>
+        </div>
+
+        <header>
+    <h1>PyzSent - Dashboard</h1>
+    <button id="logoutBtn" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Sair
+    </button>
+</header>
+
+        <main>
+            <!-- Filtros -->
+            <section class="filtros">
+                <div class="filtro-item">
+                    <div class="filtro-header">
+                        <label for="filtroInstrumento"
+                            >Filtrar Instrumentos:</label
+                        >
+                        <span class="contador-instrumentos">0 itens</span>
+                    </div>
+                    <select id="filtroInstrumento">
+                        <option value="todos" selected>
+                            Todos os Instrumentos
+                        </option>
+                    </select>
+                </div>
+
+                <div class="filtro-item">
+                    <label for="filtroDataInicio">Data Início:</label>
+                    <input
+                        type="date"
+                        id="filtroDataInicio"
+                        aria-label="Selecione a data de início"
+                    />
+                </div>
+
+                <div class="filtro-item">
+                    <label for="filtroDataFim">Data Fim:</label>
+                    <input
+                        type="date"
+                        id="filtroDataFim"
+                        aria-label="Selecione a data final"
+                    />
+                    <small
+                        id="dataError"
+                        class="error-message"
+                        style="display: none"
+                        >Data fim deve ser maior que data início</small
+                    >
+                </div>
+
+                <div class="filtro-item">
+                    <div class="filtro-header">
+                        <label for="filtroSeco">Tipo de Instrumento:</label>
+                        <span class="contador-seco">0 itens</span>
+                    </div>
+                    <select
+                        id="filtroSeco"
+                        aria-label="Filtrar por estado seco"
+                    >
+                        <option value="todos" selected>Todos</option>
+                        <option value="Sim">Seco</option>
+                        <option value="Não">Não Seco</option>
+                    </select>
+                </div>
+
+                <div class="filtro-item btn-container">
+                    <button
+                        id="btnFiltrar"
+                        aria-label="Aplicar filtros selecionados"
+                    >
+                        <i class="fas fa-filter"></i> Aplicar Filtros
+                    </button>
+                    <button
+                        id="btnExportar"
+                        class="btn-exportar"
+                        aria-label="Exportar dados"
+                    >
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                    <button
+                        id="btnReset"
+                        class="btn-reset"
+                        aria-label="Resetar filtros"
+                    >
+                        <i class="fas fa-undo"></i> Resetar
+                    </button>
+                </div>
+            </section>
+
+            <!-- Painel com os cartões dos instrumentos -->
+            <section
+                id="painelInstrumentos"
+                class="painel-instrumentos"
+                aria-live="polite"
+            ></section>
+
+            <!-- Detalhes do Instrumento -->
+            <section
+                id="detalhesInstrumento"
+                class="detalhes"
+                data-visible="false"
+                aria-hidden="true"
+            >
+                <button
+                    id="fecharDetalhes"
+                    class="btn-fechar"
+                    aria-label="Fechar detalhes"
+                >
+                    ✖ Fechar
+                </button>
+                <h2 id="tituloInstrumento"></h2>
+                <div id="infoInstrumento"></div>
+
+                <div class="graficos-detalhes">
+                    <div class="grafico-container">
+                        <canvas
+                            id="graficoResultado"
+                            width="400"
+                            height="250"
+                            aria-label="Gráfico de resultado em metros"
+                        ></canvas>
+                    </div>
+                    <div class="grafico-container">
+                        <canvas
+                            id="graficoPressao"
+                            width="400"
+                            height="250"
+                            aria-label="Gráfico de pressão"
+                        ></canvas>
+                    </div>
+                    <div class="grafico-container">
+                        <canvas
+                            id="graficoTemperatura"
+                            width="400"
+                            height="250"
+                            aria-label="Gráfico de temperatura"
+                        ></canvas>
+                    </div>
+                    <div class="grafico-container">
+                        <canvas
+                            id="graficoPressaoBarometrica"
+                            width="400"
+                            height="250"
+                            aria-label="Gráfico de pressão barométrica"
+                        ></canvas>
+                    </div>
+                </div>
+
+                <div class="exportar-detalhes">
+                    <button id="btnExportarDetalhes" class="btn-exportar">
+                        <i class="fas fa-download"></i> Exportar Dados deste
+                        Instrumento
+                    </button>
+                </div>
+            </section>
+
+            <!-- Gráfico Geral -->
+            <section id="graficoGeralContainer" class="grafico-geral-container">
+                <h2>Média Geral dos Instrumentos</h2>
+                <div class="grafico-container">
+                    <canvas
+                        id="graficoGeral"
+                        width="800"
+                        height="400"
+                        aria-label="Gráfico geral de médias"
+                    ></canvas>
+                </div>
+            </section>
+        </main>
+
+        <!-- Script principal -->
+        <script src="js/script.js"></script>
+    </body>
+</html>
