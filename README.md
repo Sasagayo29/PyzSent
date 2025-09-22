@@ -1,4 +1,4 @@
-# PyzSent - Dashboard de Monitoramento de Instrumentos Piezométricos
+# <img width="40" height="40" alt="Logo" src="https://github.com/user-attachments/assets/e563043b-298e-4613-aae5-81cbeeb3e999" /> PyzSent - Dashboard de Monitoramento de Instrumentos Piezométricos
 
 O **PyzSent** é um sistema web interativo para visualização, filtragem e exportação de dados provenientes de instrumentos piezométricos. A ferramenta foi projetada para engenheiros, técnicos e pesquisadores que necessitam monitorar variações de pressão, temperatura e níveis piezométricos em campo.
 
